@@ -24,8 +24,8 @@ public class ProjectService {
     public List<ProjectResponseDTO> listProjectByUser(User user) {
         List<Project> projects = projectRepository.findByOwner(user);
         return projects.stream()
-                .map(ProjectMapper::toDTO)
-                .collect(Collectors.toList());
+                .map(ProjectMapper::toDto)
+                .toList();
     }
 
     public ProjectResponseDTO getProjectByIdAndUser(Long ProjectId, User user) {
@@ -33,14 +33,14 @@ public class ProjectService {
                 .filter(p -> p.getOwner().getId().equals(user.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado!"));
 
-        return ProjectMapper.toDTO(project);
+        return ProjectMapper.toDto(project);
     }
 
     public ProjectResponseDTO createProject(ProjectRequestDTO dto, User user) {
         Project project = ProjectMapper.toEntity(dto);
         project.setOwner(user);
         project = projectRepository.save(project);
-        return ProjectMapper.toDTO(project);
+        return ProjectMapper.toDto(project);
     }
 
     public ProjectResponseDTO updateProject(Long id, ProjectRequestDTO dto, User user) {
@@ -52,7 +52,7 @@ public class ProjectService {
         project.setDescription(dto.getDescription());
         project = projectRepository.save(project);
 
-        return ProjectMapper.toDTO(project);
+        return ProjectMapper.toDto(project);
     }
 
     public void deleteProject(Long id, User user) {

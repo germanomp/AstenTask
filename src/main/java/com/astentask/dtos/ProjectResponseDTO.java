@@ -1,6 +1,5 @@
 package com.astentask.dtos;
 
-import com.astentask.model.User;
 import lombok.Builder;
 import lombok.Data;
 
@@ -14,5 +13,5 @@ public class ProjectResponseDTO {
     private String description;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private User owner;
+    private UserResponseDTO owner;
 }
