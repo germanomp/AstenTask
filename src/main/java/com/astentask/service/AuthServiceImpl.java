@@ -6,10 +6,7 @@ import com.astentask.model.Role;
 import com.astentask.model.User;
 import com.astentask.repositories.UserRepository;
 import com.astentask.security.JwtUtil;
-import com.astentask.service.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +24,7 @@ public class AuthServiceImpl implements AuthService {
     private final Map<String, String> refreshTokenStore = new ConcurrentHashMap<>();
 
     @Override
-    public AuthResponse register(RegisterRequest request) {
+    public AuthResponseDTO register(RegisterRequestDTO request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new RuntimeException("Email já está em uso.");
         }
@@ -46,11 +43,11 @@ public class AuthServiceImpl implements AuthService {
 
         refreshTokenStore.put(user.getEmail(), refreshToken);
 
-        return new AuthResponse(accessToken, refreshToken);
+        return new AuthResponseDTO(accessToken, refreshToken);
     }
 
     @Override
-    public AuthResponse login(LoginRequest request) {
+    public AuthResponseDTO login(LoginRequestDTO request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
@@ -63,11 +60,11 @@ public class AuthServiceImpl implements AuthService {
 
         refreshTokenStore.put(user.getEmail(), refreshToken);
 
-        return new AuthResponse(accessToken, refreshToken);
+        return new AuthResponseDTO(accessToken, refreshToken);
     }
 
     @Override
-    public AuthResponse refreshToken(RefreshTokenRequest request) {
+    public AuthResponseDTO refreshToken(RefreshTokenRequestDTO request) {
         String oldToken = request.getRefreshToken();
         if (!jwtUtil.isTokenValid(oldToken)) {
             throw new RuntimeException("Refresh token inválido ou expirado");
@@ -85,11 +82,11 @@ public class AuthServiceImpl implements AuthService {
 
         refreshTokenStore.put(email, newRefreshToken);
 
-        return new AuthResponse(newAccessToken, newRefreshToken);
+        return new AuthResponseDTO(newAccessToken, newRefreshToken);
     }
 
     @Override
-    public void logout(RefreshTokenRequest request) {
+    public void logout(RefreshTokenRequestDTO request) {
         String email = jwtUtil.extractEmail(request.getRefreshToken());
         refreshTokenStore.remove(email);
     }

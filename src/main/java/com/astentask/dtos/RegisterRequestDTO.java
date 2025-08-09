@@ -3,7 +3,7 @@ package com.astentask.dtos;
 import lombok.Data;
 
 @Data
-public class RegisterRequest {
+public class RegisterRequestDTO {
     private String name;
     private String email;
     private String password;

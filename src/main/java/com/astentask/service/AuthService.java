@@ -1,13 +1,13 @@
 package com.astentask.service;
 
-import com.astentask.dtos.AuthResponse;
-import com.astentask.dtos.LoginRequest;
-import com.astentask.dtos.RefreshTokenRequest;
-import com.astentask.dtos.RegisterRequest;
+import com.astentask.dtos.AuthResponseDTO;
+import com.astentask.dtos.LoginRequestDTO;
+import com.astentask.dtos.RefreshTokenRequestDTO;
+import com.astentask.dtos.RegisterRequestDTO;
 
 public interface AuthService {
-    AuthResponse register(RegisterRequest request);
-    AuthResponse login(LoginRequest request);
-    AuthResponse refreshToken(RefreshTokenRequest request);
-    void logout(RefreshTokenRequest request);
+    AuthResponseDTO register(RegisterRequestDTO request);
+    AuthResponseDTO login(LoginRequestDTO request);
+    AuthResponseDTO refreshToken(RefreshTokenRequestDTO request);
+    void logout(RefreshTokenRequestDTO request);
 }
