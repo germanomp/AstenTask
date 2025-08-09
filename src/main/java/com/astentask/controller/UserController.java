@@ -2,11 +2,18 @@ package com.astentask.controller;
 
 import com.astentask.dtos.UserResponseDTO;
 import com.astentask.dtos.UserUpdateRequestDTO;
+import com.astentask.model.Role;
 import com.astentask.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/users")
@@ -20,10 +27,24 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
+    @GetMapping
+    public ResponseEntity<Page<UserResponseDTO>> listUsers(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) Role role,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                userService.searchUsers(name, email, role, startDate, endDate, pageable)
+        );
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(
             @PathVariable Long id,
-            @RequestBody UserUpdateRequestDTO dto) {
+            @Valid @RequestBody UserUpdateRequestDTO dto) {
         return ResponseEntity.ok(userService.updateUser(id, dto));
     }
 
