@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15
+    container_name: astentask_db
+    restart: always
+    environment:
+      POSTGRES_DB: astentask
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - "5433:5432"
+    networks:
+      - astentask-network
+
+  app:
+    build: .
+    container_name: astentask_app
+    restart: always
+    image: germanomp/astentask
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - astentask-network
+
+networks:
+  astentask-network:
+    driver: bridge
