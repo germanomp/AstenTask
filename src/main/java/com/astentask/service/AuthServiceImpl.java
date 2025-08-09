@@ -1,4 +1,4 @@
-package com.astentask.service.impl;
+package com.astentask.service;
 
 import com.astentask.dtos.*;
 import com.astentask.exception.ResourceNotFoundException;
@@ -24,7 +24,6 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    //teste
     private final Map<String, String> refreshTokenStore = new ConcurrentHashMap<>();
 
     @Override

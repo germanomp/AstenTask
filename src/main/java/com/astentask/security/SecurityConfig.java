@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -34,9 +35,41 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/external/import-users").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/external/import-users").hasAnyRole("ADMIN")
+                        .requestMatchers("/api/users/**").hasAnyRole("ADMIN")
+                        //autenticação
+                        .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+                        //projetos
+                        .requestMatchers(HttpMethod.GET, "/api/projects").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER", "VIEWER")
+                        .requestMatchers(HttpMethod.POST, "/api/projects").hasAnyRole("ADMIN", "PROJECT_MANAGER")
+                        .requestMatchers(HttpMethod.GET, "/api/projects/*").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER", "VIEWER")
+                        .requestMatchers(HttpMethod.PUT, "/api/projects/*").hasAnyRole("ADMIN", "PROJECT_MANAGER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/projects/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/projects/*/stats").hasAnyRole("ADMIN", "PROJECT_MANAGER")
+                        //tarefas
+                        .requestMatchers(HttpMethod.GET, "/api/projects/*/tasks").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER", "VIEWER")
+                        .requestMatchers(HttpMethod.POST, "/api/projects/*/tasks").hasAnyRole("ADMIN", "PROJECT_MANAGER")
+                        .requestMatchers(HttpMethod.GET, "/api/tasks/*").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER", "VIEWER")
+                        .requestMatchers(HttpMethod.PUT, "/api/tasks/*").hasAnyRole("ADMIN", "PROJECT_MANAGER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/tasks/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/tasks/*/status").hasAnyRole("ADMIN", "PROJECT_MANAGER")
+                        .requestMatchers(HttpMethod.PUT, "/api/tasks/*/assign").hasAnyRole("ADMIN", "PROJECT_MANAGER")
+                        //comentários
+                        .requestMatchers(HttpMethod.GET, "/api/tasks/*/comments").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER", "VIEWER")
+                        .requestMatchers(HttpMethod.POST, "/api/tasks/*/comments").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER")
+                        .requestMatchers(HttpMethod.PUT, "/api/comments/*").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/comments/*").hasRole("ADMIN")
+                        //registr
+                        .requestMatchers(HttpMethod.GET, "/api/tasks/*/timelogs").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER")
+                        .requestMatchers(HttpMethod.POST, "/api/tasks/*/timelogs").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER")
+                        .requestMatchers(HttpMethod.PUT, "/api/timelogs/*").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/timelogs/*").hasRole("ADMIN")
+                        //dashboard
+                        .requestMatchers(HttpMethod.GET, "/api/dashboard/overview").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER", "VIEWER")
+                        .requestMatchers(HttpMethod.GET, "/api/dashboard/my-tasks").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER", "VIEWER")
+                        .requestMatchers(HttpMethod.GET, "/api/reports/project/*").hasAnyRole("ADMIN", "PROJECT_MANAGER")
+
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
@@ -66,6 +99,7 @@ public class SecurityConfig {
                 if (jwtUtil.isTokenValid(token)) {
                     String email = jwtUtil.extractEmail(token);
                     String role = jwtUtil.extractRole(token);
+                    System.out.println("ROLE do token: " + role);
                     var auth = new UsernamePasswordAuthenticationToken(
                             email,
                             null,
@@ -77,5 +111,6 @@ public class SecurityConfig {
             filterChain.doFilter(request, response);
         }
     }
+
 }
 
