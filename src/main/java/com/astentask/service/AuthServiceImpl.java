@@ -7,12 +7,14 @@ import com.astentask.model.User;
 import com.astentask.repositories.UserRepository;
 import com.astentask.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -25,6 +27,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponseDTO register(RegisterRequestDTO request) {
+        log.info("Registrando usuário");
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new RuntimeException("Email já está em uso.");
         }
@@ -48,6 +51,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponseDTO login(LoginRequestDTO request) {
+        log.info("Usuário fazendo login");
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
@@ -65,6 +69,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponseDTO refreshToken(RefreshTokenRequestDTO request) {
+        log.info("Usuário atualizando token");
         String oldToken = request.getRefreshToken();
         if (!jwtUtil.isTokenValid(oldToken)) {
             throw new RuntimeException("Refresh token inválido ou expirado");
@@ -87,6 +92,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void logout(RefreshTokenRequestDTO request) {
+        log.info("Usuário fazendo logout");
         String email = jwtUtil.extractEmail(request.getRefreshToken());
         refreshTokenStore.remove(email);
     }

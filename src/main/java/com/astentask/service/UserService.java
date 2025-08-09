@@ -7,10 +7,12 @@ import com.astentask.mapper.UserMapper;
 import com.astentask.model.User;
 import com.astentask.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -19,6 +21,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserResponseDTO getUserById(Long id) {
+        log.info("Buscando usuário com ID {}", id);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com ID: " + id));
         return UserMapper.toDto(user);
@@ -26,6 +29,7 @@ public class UserService {
 
     @Transactional
     public UserResponseDTO updateUser(Long id, UserUpdateRequestDTO dto) {
+        log.info("Atualizando usuário {}", id);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com id: " + id));
 
@@ -37,6 +41,7 @@ public class UserService {
 
     @Transactional
     public void deleteUser(Long id) {
+        log.warn("Deletando usuário {}", id);
         if (!userRepository.existsById(id)) {
             throw new ResourceNotFoundException("Usuário não encontrado com id: " + id);
         }
