@@ -10,51 +10,27 @@ import java.time.LocalDateTime;
 
 public class TaskSpecification {
 
+    public static Specification<Task> belongsToProject(Long projectId) {
+        return (root, query, cb) -> cb.equal(root.get("project").get("id"), projectId);
+    }
+
     public static Specification<Task> hasTitle(String title) {
-        return (root, query, cb) ->
-                title == null ? null :
-                        cb.like(cb.lower(root.get("title")), "%" + title.toLowerCase() + "%");
+        return (root, query, cb) -> cb.like(cb.lower(root.get("title")), "%" + title.toLowerCase() + "%");
     }
 
     public static Specification<Task> hasStatus(TaskStatus status) {
-        return (root, query, cb) ->
-                status == null ? null :
-                        cb.equal(root.get("status"), status);
+        return (root, query, cb) -> cb.equal(root.get("status"), status);
     }
 
     public static Specification<Task> hasPriority(TaskPriority priority) {
-        return (root, query, cb) ->
-                priority == null ? null :
-                        cb.equal(root.get("priority"), priority);
+        return (root, query, cb) -> cb.equal(root.get("priority"), priority);
     }
 
-    public static Specification<Task> assignedTo(User assignee) {
-        return (root, query, cb) ->
-                assignee == null ? null :
-                        cb.equal(root.get("assignee"), assignee);
-    }
-
-    public static Specification<Task> belongsToProject(Long projectId) {
-        return (root, query, cb) ->
-                projectId == null ? null :
-                        cb.equal(root.get("project").get("id"), projectId);
-    }
-
-    public static Specification<Task> dueDateBetween(LocalDateTime start, LocalDateTime end) {
-        return (root, query, cb) -> {
-            if (start != null && end != null) {
-                return cb.between(root.get("dueDate"), start, end);
-            }
-            return null;
-        };
+    public static Specification<Task> hasAssigneeId(Long assigneeId) {
+        return (root, query, cb) -> cb.equal(root.get("assignee").get("id"), assigneeId);
     }
 
     public static Specification<Task> createdBetween(LocalDateTime start, LocalDateTime end) {
-        return (root, query, cb) -> {
-            if (start != null && end != null) {
-                return cb.between(root.get("createdAt"), start, end);
-            }
-            return null;
-        };
+        return (root, query, cb) -> cb.between(root.get("createdAt"), start, end);
     }
 }
