@@ -43,4 +43,9 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com esse email: " + email));
+    }
+
 }

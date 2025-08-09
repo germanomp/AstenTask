@@ -1,5 +1,6 @@
 package com.astentask.mapper;
 
+import com.astentask.dtos.ProjectRequestDTO;
 import com.astentask.dtos.ProjectResponseDTO;
 import com.astentask.model.Project;
 
@@ -16,7 +17,7 @@ public class ProjectMapper {
                 .build();
     }
 
-    public static Project toEntity(ProjectResponseDTO dto) {
+    public static Project toEntity(ProjectRequestDTO dto) {
         return Project.builder()
                 .name(dto.getName())
                 .description(dto.getDescription())
