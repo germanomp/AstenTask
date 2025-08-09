@@ -17,11 +17,13 @@ services:
     build: .
     container_name: astentask_app
     restart: always
-    image: germanomp/astentask
     ports:
       - "8080:8080"
     depends_on:
       - postgres
+    volumes:
+      - ./:/app
+      - ~/.m2:/root/.m2
     networks:
       - astentask-network
 
