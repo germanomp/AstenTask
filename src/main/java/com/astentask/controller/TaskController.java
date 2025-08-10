@@ -25,24 +25,29 @@ public class TaskController {
     private final TaskService taskService;
 
     @GetMapping("/projects/{projectId}/tasks")
-    public Page<TaskResponseDTO> listTasks(@PathVariable Long projectId,
-                                           @RequestParam(required = false) String title,
-                                           @RequestParam(required = false) TaskStatus status,
-                                           @RequestParam(required = false) TaskPriority priority,
-                                           @RequestParam(required = false) Long assigneeId,
-                                           @RequestParam(required = false)
-                                           @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startCreatedAt,
-                                           @RequestParam(required = false)
-                                           @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endCreatedAt,
-                                           @RequestParam(defaultValue = "0") int page,
-                                           @RequestParam(defaultValue = "10") int size,
-                                           @RequestParam(defaultValue = "createdAt") String sortBy,
-                                           @RequestParam(defaultValue = "desc") String direction) {
+    public Page<TaskResponseDTO> listTasks(
+            @PathVariable Long projectId,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) TaskStatus status,
+            @RequestParam(required = false) TaskPriority priority,
+            @RequestParam(required = false) Long assigneeId,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startCreated,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endCreated,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction
+    ) {
+        Sort sort = direction.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
 
-        Sort sort = direction.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        return taskService.listTasks(projectId, title, status, priority, assigneeId, startCreatedAt, endCreatedAt, pageable);
+        return taskService.listTasks(projectId, title, status, priority,
+                assigneeId, startCreated, endCreated, pageable);
     }
 
     @GetMapping("/tasks/{id}")
