@@ -2,11 +2,13 @@ package com.astentask.service;
 
 import com.astentask.dtos.ProjectRequestDTO;
 import com.astentask.dtos.ProjectResponseDTO;
+import com.astentask.dtos.ProjectStatsDTO;
 import com.astentask.exception.ResourceNotFoundException;
 import com.astentask.mapper.ProjectMapper;
 import com.astentask.model.Project;
 import com.astentask.model.User;
 import com.astentask.repositories.ProjectRepository;
+import com.astentask.repositories.TaskRepository;
 import com.astentask.specification.ProjectSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -28,6 +31,7 @@ import java.util.stream.Collectors;
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final TaskRepository taskRepository;
 
     @Transactional(readOnly = true)
     public Page<ProjectResponseDTO> listProjectByUser(
@@ -102,5 +106,24 @@ public class ProjectService {
 
         projectRepository.delete(project);
         log.info("Projeto deletado id {}", id);
+    }
+
+    public ProjectStatsDTO getProjectStats(Long projectId) {
+        long total = taskRepository.countByProjectId(projectId);
+
+        Map<String, Long> byStatus = taskRepository.countTasksGroupedByStatus(projectId);
+
+        Map<String, Long> byPriority = taskRepository.countTasksGroupedByPriority(projectId);
+
+        long doneCount = byStatus.getOrDefault("DONE", 0L);
+        double completionPercentage = total > 0 ? (doneCount * 100.0) / total : 0.0;
+
+        return new ProjectStatsDTO(
+                projectId,
+                total,
+                byStatus,
+                byPriority,
+                completionPercentage
+        );
     }
 }

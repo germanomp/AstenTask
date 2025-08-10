@@ -2,6 +2,7 @@ package com.astentask.controller;
 
 import com.astentask.dtos.ProjectRequestDTO;
 import com.astentask.dtos.ProjectResponseDTO;
+import com.astentask.dtos.ProjectStatsDTO;
 import com.astentask.model.User;
 import com.astentask.repositories.UserRepository;
 import com.astentask.service.ProjectService;
@@ -69,6 +70,11 @@ public class ProjectController {
     public void deleteProject(@PathVariable Long id, Authentication authentication) {
         User user = getUserFromAuth(authentication);
         projectService.deleteProject(id, user);
+    }
+
+    @GetMapping("/{id}/stats")
+    public ProjectStatsDTO getStats(@PathVariable Long id) {
+        return projectService.getProjectStats(id);
     }
 
     private User getUserFromAuth(Authentication authentication) {
