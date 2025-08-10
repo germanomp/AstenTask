@@ -55,6 +55,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/tasks/*").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/tasks/*/status").hasAnyRole("ADMIN", "PROJECT_MANAGER")
                         .requestMatchers(HttpMethod.PUT, "/api/tasks/*/assign").hasAnyRole("ADMIN", "PROJECT_MANAGER")
+                        .requestMatchers(HttpMethod.POST, "/api/tasks/*/attachments").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER")
+                        .requestMatchers(HttpMethod.GET, "/api/tasks/*/attachments").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER")
+                        .requestMatchers(HttpMethod.GET, "/api/tasks/*/attachments/*").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER")
                         //comentários
                         .requestMatchers(HttpMethod.GET, "/api/tasks/*/comments").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER", "VIEWER")
                         .requestMatchers(HttpMethod.POST, "/api/tasks/*/comments").hasAnyRole("ADMIN", "PROJECT_MANAGER", "DEVELOPER")
