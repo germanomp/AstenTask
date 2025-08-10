@@ -3,13 +3,15 @@ package com.astentask.service;
 import com.astentask.dtos.ProjectRequestDTO;
 import com.astentask.dtos.ProjectResponseDTO;
 import com.astentask.dtos.ProjectStatsDTO;
+import com.astentask.dtos.TaskResponseDTO;
 import com.astentask.exception.ResourceNotFoundException;
 import com.astentask.mapper.ProjectMapper;
-import com.astentask.model.Project;
-import com.astentask.model.User;
+import com.astentask.mapper.TaskMapper;
+import com.astentask.model.*;
 import com.astentask.repositories.ProjectRepository;
 import com.astentask.repositories.TaskRepository;
 import com.astentask.specification.ProjectSpecification;
+import com.astentask.specification.TaskSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -32,6 +34,7 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final TaskRepository taskRepository;
+    private final TaskMapper taskMapper;
 
     @Transactional(readOnly = true)
     public Page<ProjectResponseDTO> listProjectByUser(
@@ -108,22 +111,59 @@ public class ProjectService {
         log.info("Projeto deletado id {}", id);
     }
 
-    public ProjectStatsDTO getProjectStats(Long projectId) {
-        long total = taskRepository.countByProjectId(projectId);
+    public ProjectStatsDTO getProjectStatsFiltered(
+            Long projectId,
+            String statusFilter,
+            String priorityFilter,
+            Long assigneeId,
+            LocalDateTime startCreated,
+            LocalDateTime endCreated,
+            Pageable pageable
+    ) {
+        Specification<Task> spec = TaskSpecification.belongsToProject(projectId);
 
-        Map<String, Long> byStatus = taskRepository.countTasksGroupedByStatus(projectId);
+        if (statusFilter != null) {
+            spec = spec.and(TaskSpecification.hasStatus(TaskStatus.valueOf(statusFilter)));
+        }
+        if (priorityFilter != null) {
+            spec = spec.and(TaskSpecification.hasPriority(TaskPriority.valueOf(priorityFilter)));
+        }
+        if (assigneeId != null) {
+            spec = spec.and(TaskSpecification.hasAssigneeId(assigneeId));
+        }
+        if (startCreated != null && endCreated != null) {
+            spec = spec.and(TaskSpecification.createdBetween(startCreated, endCreated));
+        }
 
-        Map<String, Long> byPriority = taskRepository.countTasksGroupedByPriority(projectId);
+        Page<Task> filteredPage = taskRepository.findAll(spec, pageable);
+
+        // Estatísticas calculadas somente com base no filtro aplicado
+        long total = filteredPage.getTotalElements();
+
+        Map<String, Long> byStatus = filteredPage.stream()
+                .collect(Collectors.groupingBy(
+                        t -> t.getStatus().name(),
+                        Collectors.counting()
+                ));
+
+        Map<String, Long> byPriority = filteredPage.stream()
+                .collect(Collectors.groupingBy(
+                        t -> t.getPriority().name(),
+                        Collectors.counting()
+                ));
 
         long doneCount = byStatus.getOrDefault("DONE", 0L);
         double completionPercentage = total > 0 ? (doneCount * 100.0) / total : 0.0;
+
+        Page<TaskResponseDTO> dtoPage = filteredPage.map(taskMapper::toDTO);
 
         return new ProjectStatsDTO(
                 projectId,
                 total,
                 byStatus,
                 byPriority,
-                completionPercentage
+                completionPercentage,
+                dtoPage
         );
     }
 }

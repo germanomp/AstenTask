@@ -15,6 +15,7 @@ import com.astentask.repositories.UserRepository;
 import com.astentask.specification.TaskSpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class TaskService {
 
     private final TaskRepository taskRepository;
@@ -76,7 +78,6 @@ public class TaskService {
             assignee = userRepository.findById(dto.getAssigneeId())
                     .orElseThrow(() -> new ResourceNotFoundException("Usuário (assignee) não encontrado com id " + dto.getAssigneeId()));
         }
-
         Task task = taskMapper.toEntity(dto, assignee);
         task.setProject(project);
         Task saved = taskRepository.save(task);

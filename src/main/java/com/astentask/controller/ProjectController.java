@@ -3,6 +3,8 @@ package com.astentask.controller;
 import com.astentask.dtos.ProjectRequestDTO;
 import com.astentask.dtos.ProjectResponseDTO;
 import com.astentask.dtos.ProjectStatsDTO;
+import com.astentask.model.TaskPriority;
+import com.astentask.model.TaskStatus;
 import com.astentask.model.User;
 import com.astentask.repositories.UserRepository;
 import com.astentask.service.ProjectService;
@@ -10,6 +12,9 @@ import com.astentask.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -73,8 +78,22 @@ public class ProjectController {
     }
 
     @GetMapping("/{id}/stats")
-    public ProjectStatsDTO getStats(@PathVariable Long id) {
-        return projectService.getProjectStats(id);
+    public ProjectStatsDTO getStats(
+            @PathVariable Long id,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String priority,
+            @RequestParam(required = false) Long assigneeId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startCreated,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endCreated,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction
+    ) {
+        Sort sort = direction.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return projectService.getProjectStatsFiltered(id, status, priority, assigneeId, startCreated, endCreated, pageable);
     }
 
     private User getUserFromAuth(Authentication authentication) {
