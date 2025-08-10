@@ -137,7 +137,6 @@ public class ProjectService {
 
         Page<Task> filteredPage = taskRepository.findAll(spec, pageable);
 
-        // Estatísticas calculadas somente com base no filtro aplicado
         long total = filteredPage.getTotalElements();
 
         Map<String, Long> byStatus = filteredPage.stream()
