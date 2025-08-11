@@ -24,8 +24,11 @@ public class SwaggerConfig {
                 .info(new Info()
                         .title("AstenTask")
                         .version("1.0")
-                        .description("Documentação da API de gerenciamento de projetos e tarefas - AstenTask")
-                        .license(new License().name("Apache 2.0").url("http://springdoc.org")));
+                        .description("API REST para gerenciamento de projetos e tarefas, similar ao Jira/Trello.\n" +
+                                "\nPossui autenticação JWT, controle de roles e operações para usuários, projetos, tarefas e comentários.")
+                        .license(new License()
+                                .name("Apache 2.0")
+                                .url("http://springdoc.org")));
     }
 
 }
