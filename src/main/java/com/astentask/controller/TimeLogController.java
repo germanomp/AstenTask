@@ -3,7 +3,7 @@ package com.astentask.controller;
 import com.astentask.dtos.ErrorResponseDTO;
 import com.astentask.dtos.TimeLogCreateDTO;
 import com.astentask.dtos.TimeLogDTO;
-import com.astentask.dtos.pages.PagedResponseDTOTimeLogResponseDTO;
+import com.astentask.dtos.pages.PagedResponseDTOTimeLogDTO;
 import com.astentask.service.TimeLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,8 +35,8 @@ public class TimeLogController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Lista de registros de tempo retornada com sucesso",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = PagedResponseDTOTimeLogResponseDTO.class))),
-                    @ApiResponse(responseCode = "403", description = "Sem permissão",
+                                    schema = @Schema(implementation = PagedResponseDTOTimeLogDTO.class))),
+                    @ApiResponse(responseCode = "403", description = "Acesso negado",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = ErrorResponseDTO.class))),
                     @ApiResponse(responseCode = "404", description = "Tarefa não encontrada",
@@ -66,7 +66,7 @@ public class TimeLogController {
                     @ApiResponse(responseCode = "201", description = "Registro de tempo criado com sucesso",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = TimeLogDTO.class))),
-                    @ApiResponse(responseCode = "403", description = "Sem permissão",
+                    @ApiResponse(responseCode = "403", description = "Acesso negado",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = ErrorResponseDTO.class))),
                     @ApiResponse(responseCode = "404", description = "Tarefa não encontrada",
@@ -89,7 +89,7 @@ public class TimeLogController {
                     @ApiResponse(responseCode = "200", description = "Registro de tempo atualizado com sucesso",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = TimeLogDTO.class))),
-                    @ApiResponse(responseCode = "403", description = "Sem permissão",
+                    @ApiResponse(responseCode = "403", description = "Acesso negado",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = ErrorResponseDTO.class))),
                     @ApiResponse(responseCode = "404", description = "Registro de tempo não encontrado",
@@ -110,7 +110,7 @@ public class TimeLogController {
             description = "Remove um registro de tempo do sistema.",
             responses = {
                     @ApiResponse(responseCode = "204", description = "Registro de tempo excluído com sucesso"),
-                    @ApiResponse(responseCode = "403", description = "Sem permissão",
+                    @ApiResponse(responseCode = "403", description = "Acesso negado",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = ErrorResponseDTO.class))),
                     @ApiResponse(responseCode = "404", description = "Registro de tempo não encontrado",

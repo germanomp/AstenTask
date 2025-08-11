@@ -41,8 +41,8 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(user);
 
-        String accessToken = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
-        String refreshToken = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+        String accessToken = jwtUtil.generateAccessToken(user.getEmail(), user.getRole().name());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getEmail(), user.getRole().name());
 
         refreshTokenStore.put(user.getEmail(), refreshToken);
 
@@ -59,8 +59,8 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Credenciais inválidas");
         }
 
-        String accessToken = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
-        String refreshToken = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+        String accessToken = jwtUtil.generateAccessToken(user.getEmail(), user.getRole().name());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getEmail(), user.getRole().name());
 
         refreshTokenStore.put(user.getEmail(), refreshToken);
 
@@ -69,21 +69,28 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponseDTO refreshToken(RefreshTokenRequestDTO request) {
-        log.info("Usuário atualizando token");
-        String oldToken = request.getRefreshToken();
-        if (!jwtUtil.isTokenValid(oldToken)) {
+        String oldRefreshToken = request.getRefreshToken();
+
+        if (!jwtUtil.isTokenValid(oldRefreshToken)) {
             throw new RuntimeException("Refresh token inválido ou expirado");
         }
 
-        String email = jwtUtil.extractEmail(oldToken);
-        String savedRefresh = refreshTokenStore.get(email);
+        if (jwtUtil.extractTokenType(oldRefreshToken) != JwtUtil.TokenType.REFRESH) {
+            throw new RuntimeException("Token inválido para refresh");
+        }
 
-        if (!oldToken.equals(savedRefresh)) {
+        String email = jwtUtil.extractEmail(oldRefreshToken);
+        String savedRefreshToken = refreshTokenStore.get(email);
+
+        if (!oldRefreshToken.equals(savedRefreshToken)) {
             throw new RuntimeException("Refresh token não autorizado");
         }
 
-        String newAccessToken = jwtUtil.generateToken(email, jwtUtil.extractRole(oldToken));
-        String newRefreshToken = jwtUtil.generateToken(email, jwtUtil.extractRole(oldToken));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        String newAccessToken = jwtUtil.generateAccessToken(user.getEmail(), user.getRole().name());
+        String newRefreshToken = jwtUtil.generateRefreshToken(user.getEmail(), user.getRole().name());
 
         refreshTokenStore.put(email, newRefreshToken);
 
