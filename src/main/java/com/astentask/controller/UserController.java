@@ -3,6 +3,8 @@ package com.astentask.controller;
 import com.astentask.dtos.ErrorResponseDTO;
 import com.astentask.dtos.UserResponseDTO;
 import com.astentask.dtos.UserUpdateRequestDTO;
+import com.astentask.dtos.pages.PagedResponseDTO;
+import com.astentask.dtos.pages.PagedResponseDTOUserResponseDTO;
 import com.astentask.model.Role;
 import com.astentask.service.UserService;
 import io.lettuce.core.dynamic.annotation.Param;
@@ -55,7 +57,7 @@ public class UserController {
             description = "Retorna uma lista paginada de usuários filtrando opcionalmente por nome, email, papel e intervalo de datas.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Lista de usuários retornada com sucesso",
-                            content = @Content(schema = @Schema(implementation = Page.class))),
+                            content = @Content(schema = @Schema(implementation = PagedResponseDTOUserResponseDTO.class))),
                     @ApiResponse(responseCode = "403", description = "Sem permissão",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = ErrorResponseDTO.class))),
@@ -64,7 +66,7 @@ public class UserController {
                                     schema = @Schema(implementation = ErrorResponseDTO.class)))
             })
     @GetMapping
-    public ResponseEntity<Page<UserResponseDTO>> listUsers(
+    public ResponseEntity<PagedResponseDTO<UserResponseDTO>> listUsers(
             @Parameter(description = "Filtrar por nome") @RequestParam(required = false) String name,
             @Parameter(description = "Filtrar por email") @RequestParam(required = false) String email,
             @Parameter(description = "Filtar por papel") @RequestParam(required = false) Role role,
@@ -74,9 +76,15 @@ public class UserController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
             Pageable pageable
     ) {
-        return ResponseEntity.ok(
-                userService.searchUsers(name, email, role, startDate, endDate, pageable)
-        );
+        Page<UserResponseDTO> page = userService.searchUsers(name, email, role, startDate, endDate, pageable);
+        return ResponseEntity.ok(new PagedResponseDTO<>(
+                page.getContent(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isLast()
+        ));
     }
 
     @Operation(summary = "Atualizar usuário",
