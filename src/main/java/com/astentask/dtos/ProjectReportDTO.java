@@ -9,7 +9,8 @@ public class ProjectReportDTO {
     private Long projectId;
     private String projectName;
     private Long totalTasks;
+    private Long pendingTasks;
+    private Long inProgressTasks;
     private Long completedTasks;
-    private Long openTasks;
     private Long totalTimeLoggedMinutes;
 }

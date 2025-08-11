@@ -32,14 +32,16 @@ public class DashboardService {
 
     public DashboardOverviewDTO getOverview(Long userId) {
         Long totalTasks = taskRepository.countByAssigneeId(userId);
-        Long openTasks = taskRepository.countByAssigneeIdAndStatus(userId, TaskStatus.PENDING);
+        Long pendingTasks = taskRepository.countByAssigneeIdAndStatus(userId, TaskStatus.PENDING);
+        Long inProgressTasks = taskRepository.countByAssigneeIdAndStatus(userId, TaskStatus.IN_PROGRESS);
         Long completedTasks = taskRepository.countByAssigneeIdAndStatus(userId, TaskStatus.COMPLETED);
 
         Long totalTimeLogged = timeLogRepository.sumDurationByUserId(userId).orElse(0L);
 
         return DashboardOverviewDTO.builder()
                 .totalTasks(totalTasks)
-                .openTasks(openTasks)
+                .pendingTasks(pendingTasks)
+                .inProgressTasks(inProgressTasks)
                 .completedTasks(completedTasks)
                 .totalTimeLoggedMinutes(totalTimeLogged)
                 .build();
@@ -92,8 +94,9 @@ public class DashboardService {
                 .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
 
         Long totalTasks = taskRepository.countByProjectId(projectId);
+        Long pendingTasks = taskRepository.countByProjectIdAndStatus(projectId, TaskStatus.PENDING);
+        Long inProgressTasks = taskRepository.countByProjectIdAndStatus(projectId, TaskStatus.IN_PROGRESS);
         Long completedTasks = taskRepository.countByProjectIdAndStatus(projectId, TaskStatus.COMPLETED);
-        Long openTasks = taskRepository.countByProjectIdAndStatus(projectId, TaskStatus.PENDING);
 
 
         Long totalTimeLogged = timeLogRepository.sumDurationByProjectId(projectId).orElse(0L);
@@ -102,8 +105,9 @@ public class DashboardService {
                 .projectId(projectId)
                 .projectName(project.getName())
                 .totalTasks(totalTasks)
+                .pendingTasks(pendingTasks)
+                .inProgressTasks(inProgressTasks)
                 .completedTasks(completedTasks)
-                .openTasks(openTasks)
                 .totalTimeLoggedMinutes(totalTimeLogged)
                 .build();
     }

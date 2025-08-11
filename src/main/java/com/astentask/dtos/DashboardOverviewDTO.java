@@ -7,7 +7,8 @@ import lombok.Data;
 @Builder
 public class DashboardOverviewDTO {
     private Long totalTasks;
-    private Long openTasks;
+    private Long pendingTasks;
+    private Long inProgressTasks;
     private Long completedTasks;
     private Long totalTimeLoggedMinutes;
 }
