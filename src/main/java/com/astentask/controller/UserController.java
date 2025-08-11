@@ -37,7 +37,8 @@ public class UserController {
             description = "Retorna os detalhes de um usuário específico.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Usuário encontrado",
-                            content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = UserResponseDTO.class))),
                     @ApiResponse(responseCode = "403", description = "Sem permissão",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = ErrorResponseDTO.class))),
@@ -57,7 +58,8 @@ public class UserController {
             description = "Retorna uma lista paginada de usuários filtrando opcionalmente por nome, email, papel e intervalo de datas.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Lista de usuários retornada com sucesso",
-                            content = @Content(schema = @Schema(implementation = PagedResponseDTOUserResponseDTO.class))),
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = PagedResponseDTOUserResponseDTO.class))),
                     @ApiResponse(responseCode = "403", description = "Sem permissão",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = ErrorResponseDTO.class))),
@@ -91,7 +93,8 @@ public class UserController {
             description = "Atualiza os dados de um usuário existente.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso",
-                            content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = UserResponseDTO.class))),
                     @ApiResponse(responseCode = "403", description = "Sem permissão",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = ErrorResponseDTO.class))),
