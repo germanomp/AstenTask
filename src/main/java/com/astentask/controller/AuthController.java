@@ -31,6 +31,9 @@ public class AuthController {
                     @ApiResponse(responseCode = "400", description = "Dados inválidos no registro",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = ErrorResponseDTO.class))),
+                    @ApiResponse(responseCode = "400", description = "E-mail em uso",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorResponseDTO.class))),
                     @ApiResponse(responseCode = "500", description = "Erro interno do servidor",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = ErrorResponseDTO.class)))
