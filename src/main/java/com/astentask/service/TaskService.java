@@ -19,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 
 import java.time.LocalDateTime;
 
@@ -33,6 +35,7 @@ public class TaskService {
     private final UserRepository userRepository;
     private final TaskMapper taskMapper;
 
+    @Cacheable(value = "tasksSearch", key = "T(java.util.Objects).hash(#projectId, #title, #status, #priority, #assigneeId, #startCreated, #endCreated, #pageable.pageNumber, #pageable.pageSize, #pageable.sort.toString())")
     public Page<TaskResponseDTO> listTasks(Long projectId, String title, TaskStatus status, TaskPriority priority,
                                            Long assigneeId, LocalDateTime startCreated, LocalDateTime endCreated,
                                            Pageable pageable) {
@@ -63,12 +66,14 @@ public class TaskService {
         return tasks.map(taskMapper::toDTO);
     }
 
+    @Cacheable(value = "tasksById", key = "#taskId")
     public TaskResponseDTO getTaskById(Long taskId) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada com id " + taskId));
         return taskMapper.toDTO(task);
     }
 
+    @CacheEvict(value = {"tasksSearch", "tasksById"}, allEntries = true)
     public TaskResponseDTO createTask(Long projectId, TaskRequestDTO dto) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado com id " + projectId));
@@ -85,6 +90,7 @@ public class TaskService {
         return taskMapper.toDTO(saved);
     }
 
+    @CacheEvict(value = {"tasksSearch", "tasksById"}, allEntries = true)
     public TaskResponseDTO updateTask(Long taskId, TaskRequestDTO dto) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada com id " + taskId));
@@ -100,12 +106,14 @@ public class TaskService {
         return taskMapper.toDTO(updated);
     }
 
+    @CacheEvict(value = {"tasksSearch", "tasksById"}, allEntries = true)
     public void deleteTask(Long taskId) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada com id " + taskId));
         taskRepository.delete(task);
     }
 
+    @CacheEvict(value = {"tasksSearch", "tasksById"}, allEntries = true)
     public TaskResponseDTO updateStatus(Long taskId, TaskStatus status) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada com id " + taskId));
@@ -114,6 +122,7 @@ public class TaskService {
         return taskMapper.toDTO(updated);
     }
 
+    @CacheEvict(value = {"tasksSearch", "tasksById"}, allEntries = true)
     public TaskResponseDTO assignUser(Long taskId, Long userId) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada com id " + taskId));

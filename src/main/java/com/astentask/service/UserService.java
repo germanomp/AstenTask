@@ -15,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 
 import java.time.LocalDateTime;
 
@@ -26,6 +28,7 @@ public class UserService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "usersById", key = "#id")
     public UserResponseDTO getUserById(Long id) {
         log.info("Buscando usuário com ID {}", id);
         User user = userRepository.findById(id)
@@ -34,6 +37,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "usersSearch", key = "T(java.util.Objects).hash(#name, #email, #role, #startDate, #endDate, #pageable.pageNumber, #pageable.pageSize, #pageable.sort.toString())")
     public Page<UserResponseDTO> searchUsers(String name, String email, Role role,
                                              LocalDateTime startDate, LocalDateTime endDate,
                                              Pageable pageable) {
@@ -53,6 +57,7 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(value = {"usersById", "usersSearch"}, allEntries = true)
     public UserResponseDTO updateUser(Long id, UserUpdateRequestDTO dto) {
         log.info("Atualizando usuário {}", id);
         User user = userRepository.findById(id)
@@ -65,6 +70,7 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(value = {"usersById", "usersSearch"}, allEntries = true)
     public void deleteUser(Long id) {
         log.warn("Deletando usuário {}", id);
         if (!userRepository.existsById(id)) {
