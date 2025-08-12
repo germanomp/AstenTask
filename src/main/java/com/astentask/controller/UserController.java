@@ -7,7 +7,6 @@ import com.astentask.dtos.pages.PagedResponseDTO;
 import com.astentask.dtos.pages.PagedResponseDTOUserResponseDTO;
 import com.astentask.model.Role;
 import com.astentask.service.UserService;
-import io.lettuce.core.dynamic.annotation.Param;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

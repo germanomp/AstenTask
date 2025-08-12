@@ -21,6 +21,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,6 +40,7 @@ public class ProjectService {
     private final TaskMapper taskMapper;
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "projectsByUser", key = "T(java.util.Objects).hash(#user != null ? #user.id : 0, #name, #startDate, #endDate, #page, #size, #sortBy, #direction)")
     public Page<ProjectResponseDTO> listProjectByUser(
             User user,
             String name,
@@ -79,6 +83,7 @@ public class ProjectService {
     }
 
     @Transactional
+    @CacheEvict(value = "projectsByUser", allEntries = true)
     public ProjectResponseDTO createProject(ProjectRequestDTO dto, User user) {
         Project project = ProjectMapper.toEntity(dto);
         project.setOwner(user);
@@ -88,6 +93,7 @@ public class ProjectService {
     }
 
     @Transactional
+    @CacheEvict(value = "projectsByUser", allEntries = true)
     public ProjectResponseDTO updateProject(Long id, ProjectRequestDTO dto, User user) {
         Project project = projectRepository.findById(id)
                 .filter(p -> p.getOwner().getId().equals(user.getId()))
@@ -102,6 +108,7 @@ public class ProjectService {
     }
 
     @Transactional
+    @CacheEvict(value = "projectsByUser", allEntries = true)
     public void deleteProject(Long id, User user) {
         Project project = projectRepository.findById(id)
                 .filter(p -> p.getOwner().getId().equals(user.getId()))
