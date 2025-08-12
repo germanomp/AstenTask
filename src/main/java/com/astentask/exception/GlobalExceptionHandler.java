@@ -53,6 +53,19 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
 
+    @ExceptionHandler(EmailAlreadyUsedException.class)
+    public ResponseEntity<ErrorResponseDTO> handleEmailAlreadyInUse(EmailAlreadyUsedException ex) {
+        log.warn("Tentativa de registro com email já existente: {}", ex.getMessage());
+
+        ErrorResponseDTO error = new ErrorResponseDTO(
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                Instant.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleGeneral(Exception ex) {
       log.error("Erro inesperado: ", ex);

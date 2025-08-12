@@ -1,6 +1,7 @@
 package com.astentask.service;
 
 import com.astentask.dtos.*;
+import com.astentask.exception.EmailAlreadyUsedException;
 import com.astentask.exception.ResourceNotFoundException;
 import com.astentask.model.Role;
 import com.astentask.model.User;
@@ -29,8 +30,9 @@ public class AuthServiceImpl implements AuthService {
     public AuthResponseDTO register(RegisterRequestDTO request) {
         log.info("Registrando usuário");
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("Email já está em uso.");
+            throw new EmailAlreadyUsedException("Email já está em uso.");
         }
+
 
         User user = User.builder()
                 .name(request.getName())
