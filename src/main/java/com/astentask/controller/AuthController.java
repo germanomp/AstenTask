@@ -27,7 +27,7 @@ public class AuthController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Registro realizado com sucesso",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = AuthResponseDTO.class))),
+                                    schema = @Schema(implementation = MessageResponseDTO.class))),
                     @ApiResponse(responseCode = "400", description = "Dados inválidos no registro",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = ErrorResponseDTO.class))),
@@ -40,7 +40,7 @@ public class AuthController {
             }
     )
     @PostMapping("/register")
-    public ResponseEntity<AuthResponseDTO> register(
+    public ResponseEntity<MessageResponseDTO> register(
             @Parameter(description = "Dados para registro do usuário") @Valid @RequestBody RegisterRequestDTO request) {
         return ResponseEntity.ok(authService.register(request));
     }

@@ -48,13 +48,15 @@ O projeto está pronto para rodar via **Docker Compose** com **PostgreSQL**.
     
 -   Se **local** (sem Docker): host `localhost`, **porta 5432**, usuário `postgres`, senha `123456`
 
+-   É criado um usuário **Admin**  automaticamente para gerenciamento, email: `admin@astentask`, senha: `admin123`
+
 ----------
 
 ## 🔐 Autenticação & Autorização
 
 -   **JWT Bearer** em todas as rotas protegidas.
     
--   Após **registrar** e **logar**, copie o token retornado e envie no header: `Authorization: Bearer SEU_TOKEN_JWT` (postman) .
+-   Após **registrar** e **logar**, copie o token retornado e envie no header: `Authorization: Bearer SEU_TOKEN_JWT` (no postman - a coleção está na pasta raiz) .
     
 -   No **Swagger UI** clique em **Authorize** e cole `SEU_TOKEN_JWT` (apenas token).
     
